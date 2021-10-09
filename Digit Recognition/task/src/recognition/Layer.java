@@ -1,9 +1,10 @@
 package recognition;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Layer {
+public class Layer implements Serializable {
     private final int neuronCount;
     private final List<Neuron> neurons = new ArrayList<>();
 
@@ -22,9 +23,9 @@ public class Layer {
         }
     }
 
-    public void activationFromPrevLayer(Layer layer) {
+    public void activationFromPrevLayer(Layer prevLayer) {
         for (Neuron neuron : neurons) {
-            neuron.activationFromPrevLayer(layer);
+            neuron.activationFromPrevLayer(prevLayer);
         }
     }
 

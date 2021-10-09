@@ -4,12 +4,12 @@ import java.util.*;
 
 public class Main {
     private static void println(String string) { System.out.println(string); }
+    private static void print(String string) { System.out.print(string); }
 
     private static String getString(String input) {
         Scanner scanner = new Scanner(System.in);
-        println(input);
+        print(input);
         var out = scanner.nextLine();
-//        scanner.close();
         return out;
     }
     private static void printChoice() {
@@ -47,9 +47,6 @@ public class Main {
                     e.printStackTrace();
                 }
 
-                StringBuilder inputLine = new StringBuilder();
-                System.out.println("Input grid:");
-
                 var scanInputData = new Scanner(System.in).useDelimiter("\\s*");
                 println("Input grid:");
                 var inputData = new double[15];
@@ -59,8 +56,16 @@ public class Main {
                 scanInputData.close();
 
                 network.setInputData(inputData);
-                System.out.println("This number is " + network.calc());
+                System.out.println("This number is " + network.recognition());
+            } else if (choice == 3) {
+                network.train(1000, 0.5);
+                try {
+                    SerializationUtils.serialize(network, FILE_NAME);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                println("Done! Saved to the file.");
             }
-        } while (choice != 2);
+        } while (choice != 4);
     }
 }

@@ -1,9 +1,10 @@
 package recognition;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
 
-public class Neuron {
+public class Neuron implements Serializable {
     private double[] weights;
     private double bias;
     private double value;
@@ -45,11 +46,11 @@ public class Neuron {
         return 1 / (1 + Math.exp(-x));
     }
 
-    public void activationFromPrevLayer(Layer layer) {
-        List<Neuron> neurons = layer.getNeurons();
+    public void activationFromPrevLayer(Layer prevLayer) {
+        List<Neuron> prevNeurons = prevLayer.getNeurons();
         value = 0;
-        for (int w = 0; w < neurons.size(); w++) {
-            value += neurons.get(w).getValue() * weights[w];
+        for (int w = 0; w < prevNeurons.size(); w++) {
+            value += prevNeurons.get(w).getValue() * weights[w];
         }
         value = sigmoid(value + bias);
     }
