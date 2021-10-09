@@ -9,19 +9,15 @@ public class Main {
     private static String getString(String input) {
         Scanner scanner = new Scanner(System.in);
         print(input);
-        var out = scanner.nextLine();
-        return out;
-    }
-    private static void printChoice() {
-        println("1. Learn the network\n2. Guess a number\nYour choice: ");
+        return scanner.nextLine();
     }
 
     public static void main(String[] args) {
-        final String FILE_NAME = "network.data";
+        final String FILE_NAME = "D:\\network.data";
         NeuralNetwork network = new NeuralNetwork();
 
         int choice;
-        do {
+//        do {
             choice = Integer.parseInt(getString("1. Learn the network\n2. Guess a number\nYour choice: "));
 
             if (choice == 1) {
@@ -57,15 +53,15 @@ public class Main {
 
                 network.setInputData(inputData);
                 System.out.println("This number is " + network.recognition());
-            } else if (choice == 3) {
-                network.train(1000, 0.5);
-                try {
-                    SerializationUtils.serialize(network, FILE_NAME);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                println("Done! Saved to the file.");
+//            } else if (choice == 3) {
+//                network.train(1000, 0.5);
+//                try {
+//                    SerializationUtils.serialize(network, FILE_NAME);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                println("Done! Saved to the file.");
             }
-        } while (choice != 4);
+//        } while (choice != 4);
     }
 }

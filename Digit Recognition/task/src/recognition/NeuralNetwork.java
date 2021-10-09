@@ -112,8 +112,9 @@ public class NeuralNetwork implements Serializable {
         for (var i = 0; i < epoch; i++) {
             trainEpoch(Ideal.getInputs(), Ideal.getOutputs(), psi);
         }
-        System.out.printf("Num of Ideal Array: %d \n", idealNum);
-        recognition();
+//        System.out.printf("Num of Ideal Array: %d \n", idealNum);
+
+//        recognition();
     }
 
     public int recognition() {
