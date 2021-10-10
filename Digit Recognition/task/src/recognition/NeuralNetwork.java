@@ -85,9 +85,10 @@ public class NeuralNetwork implements Serializable {
             gradWeight[l] = new double[currLayer.getNeuronCount()][cntW];
             gradBias[l] = new double[currLayer.getNeuronCount()];
         }
-        for (var i = 0; i < inputs.length; i++) {
-            idealNum = i;
-            trainOne(inputs[i], outputs[i], gradWeight, gradBias);
+        for (double[] input : inputs) {
+            int len = input.length;
+            idealNum = (int) input[len - 1];
+            trainOne(input, outputs[idealNum], gradWeight, gradBias);
         }
         for (var l = 1; l < size; l++) {
             var currLayer = layers.get(l);
@@ -108,16 +109,31 @@ public class NeuralNetwork implements Serializable {
         }
     }
 
-    public void train(int epoch, double psi) {
-        for (var i = 0; i < epoch; i++) {
-            trainEpoch(Ideal.getInputs(), Ideal.getOutputs(), psi);
-        }
-//        System.out.printf("Num of Ideal Array: %d \n", idealNum);
+    public void train(double[][] inputs, int epoch, double psi) {
 
-//        recognition();
+        for (var i = 0; i < epoch; i++) {
+            trainEpoch(inputs, Ideal.getOutputs(), psi);
+            if (i % 10 == 0) {
+                guessTestData(inputs);
+            }
+        }
+        System.out.printf("Num of Ideal Array: %d \n", idealNum);
+        recognition(true);
     }
 
-    public int recognition() {
+    public void guessTestData(double[][] inputs) {
+        int count = 0;
+        for (double[] input: inputs) {
+            int len = input.length;
+            idealNum = (int)input[len - 1];
+            setInputData(input);
+            if(recognition(false) == idealNum) count++;
+        }
+        int percent = count*100/inputs.length;
+        System.out.printf("The network prediction accuracy: %d/%d, %d \n", count, inputs.length, percent);
+    }
+
+    public int recognition(boolean print) {
         double maxValue = Double.MIN_VALUE;
         int bestNeuron = 0;
 
@@ -125,14 +141,15 @@ public class NeuralNetwork implements Serializable {
         List<Neuron> neurons = getOutputLayer().getNeurons();
         for (int i = 0; i < neurons.size(); i++) {
             double currValue = neurons.get(i).getValue();
-            System.out.printf(" (%d : %.3f)", i, currValue);
+//            if (print)
+//                System.out.printf(" (%d : %.3f)", i, currValue);
 
             if (currValue > maxValue) {
                 bestNeuron = i;
                 maxValue = currValue;
             }
         }
-        System.out.println();
+//        System.out.println();
         return bestNeuron;
     }
 }

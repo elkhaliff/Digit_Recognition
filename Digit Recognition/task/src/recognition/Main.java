@@ -1,4 +1,5 @@
 package recognition;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -13,14 +14,36 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        final String FILE_NAME = "D:\\network.data";
+        final String SERIAL_NETWORK_FILE_NAME = "d:\\test\\network.data";
+        final String SERIAL_DATA_FILE_NAME = "d:\\test\\testdata.data";
+        final String DATA_FILE_DIR = "d:\\test\\data";
+        final String CHOICE = "1. Learn the network\n2. Guess all the numbers\n3. Guess number from text file\nYour choice: ";
         NeuralNetwork network = new NeuralNetwork();
+        BigData bigData = new BigData();
 
         int choice;
 //        do {
-            choice = Integer.parseInt(getString("1. Learn the network\n2. Guess a number\nYour choice: "));
+            choice = Integer.parseInt(getString(CHOICE));
 
-            if (choice == 1) {
+            if (choice == 9) {
+                // Get and serialize data files
+                bigData.readDir(DATA_FILE_DIR);
+                println("Get data from 70000 files");
+                try {
+                    SerializationUtils.serialize(bigData, SERIAL_DATA_FILE_NAME);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (choice == 0) {
+                // Deserialize bigdata
+                try {
+                    bigData = (BigData) SerializationUtils.deserialize(SERIAL_DATA_FILE_NAME);
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                println("Deserialize bigdata " + bigData.getData().length);
+            } else if (choice == 1) {
+                // Learn the network
                 var strArr = getString("Enter the sizes of the layers: ").trim().split("\\s+");
                 var neuronsFromLayers = new int[strArr.length];
                 for (int l = 0; l < neuronsFromLayers.length; l++) {
@@ -29,39 +52,52 @@ public class Main {
 
                 println("Learning...");
                 network.initNetwork(neuronsFromLayers);
-                network.train(1000, 0.5);
+                for (int i = 0; i < 10; i++) {
+                    network.train(bigData.getData(), 1000, 0.5);
+                }
                 try {
-                    SerializationUtils.serialize(network, FILE_NAME);
+                    SerializationUtils.serialize(network, SERIAL_NETWORK_FILE_NAME);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 println("Done! Saved to the file.");
             } else if (choice == 2) {
+                // Guess all the numbers
                 try {
-                    network = (NeuralNetwork) SerializationUtils.deserialize(FILE_NAME);
+                    network = (NeuralNetwork) SerializationUtils.deserialize(SERIAL_NETWORK_FILE_NAME);
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-
-                var scanInputData = new Scanner(System.in).useDelimiter("\\s*");
-                println("Input grid:");
-                var inputData = new double[15];
-                for (var j = 0; j < inputData.length; j++) {
-                    inputData[j] = scanInputData.next().equals("X") ? 1 : 0;
+                network.guessTestData(bigData.getAllData());
+            } else if (choice == 3) {
+                // Guess number from text file
+                try {
+                    network = (NeuralNetwork) SerializationUtils.deserialize(SERIAL_NETWORK_FILE_NAME);
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
-                scanInputData.close();
-
-                network.setInputData(inputData);
-                System.out.println("This number is " + network.recognition());
-//            } else if (choice == 3) {
-//                network.train(1000, 0.5);
-//                try {
-//                    SerializationUtils.serialize(network, FILE_NAME);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                println("Done! Saved to the file.");
+                String fileName = getString("Enter filename: ");
+                File file = new File(fileName);
+                PartData partData = new PartData(file);
+                network.setInputData(partData.getData());
+                println("This number is " + network.recognition(true));
             }
-//        } while (choice != 4);
+            else if (choice == 4) {
+                try {
+                    network = (NeuralNetwork) SerializationUtils.deserialize(SERIAL_NETWORK_FILE_NAME);
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                for (int i = 0; i < 10; i++) {
+                    network.train(bigData.getData(), 100, 0.5);
+                    try {
+                        SerializationUtils.serialize(network, SERIAL_NETWORK_FILE_NAME);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                println("Done! Saved to the file.");
+            }
+//        } while (choice != 5);
     }
 }
